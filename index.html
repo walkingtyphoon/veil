@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Veil: private AI for sensitive documents</title>
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body>
+  <header>
+    <div class="brand"><span class="logo">◐</span> Veil <small>ask AI about private documents without giving them away</small></div>
+    <div class="chips" id="status"></div>
+  </header>
+  <main>
+    <section class="card" id="step1">
+      <h2><span class="n">1</span> Paste a document</h2>
+      <div class="samples" id="samples"></div>
+      <textarea id="input" placeholder="Paste a letter, contract, medical result or email..."></textarea>
+      <div class="row">
+        <button id="warm" class="ghost">Download on-device model</button>
+        <button id="scan" class="primary">Scan for private data on this device</button>
+      </div>
+      <div id="progress" class="muted"></div>
+    </section>
+
+    <section class="card hidden" id="step2">
+      <h2><span class="n">2</span> Review what stays private</h2>
+      <p class="muted" id="scanInfo"></p>
+      <div id="entities" class="entities"></div>
+      <div class="row"><input id="extra" placeholder="Mark more text as private (exact words)" /><button id="addExtra" class="ghost">Add</button></div>
+      <h3>Masked text (this is the most that can ever leave your device)</h3>
+      <pre id="masked" class="masked"></pre>
+    </section>
+
+    <section class="card hidden" id="step3">
+      <h2><span class="n">3</span> Ask</h2>
+      <div class="tasks" id="tasks"></div>
+      <label class="toggle"><input type="checkbox" id="strict" /> Strict local mode (never use the cloud)</label>
+      <div id="route" class="route"></div>
+      <button id="run" class="primary">Run</button>
+    </section>
+
+    <section class="card hidden" id="step4">
+      <h2><span class="n">4</span> Answer <span id="badge" class="badge"></span></h2>
+      <div id="answer" class="answer"></div>
+      <details id="ledgerBox" open>
+        <summary>Privacy ledger</summary>
+        <div id="ledger"></div>
+      </details>
+    </section>
+  </main>
+  <footer class="muted">Built with Firebase AI Logic hybrid inference: Gemini Nano in Chrome, Gemini in the cloud. Open source, Apache-2.0.</footer>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

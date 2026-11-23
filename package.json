@@ -1,0 +1,21 @@
+{
+  "name": "veil-hybrid-ai",
+  "version": "1.0.0",
+  "description": "Veil: ask AI about private documents without giving them away. Firebase AI Logic hybrid inference.",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "vitest run"
+  },
+  "license": "Apache-2.0",
+  "type": "module",
+  "dependencies": {
+    "firebase": "^13.4.0"
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2",
+    "vite": "^8.3.8",
+    "vitest": "^5.1.1"
+  }
+}
