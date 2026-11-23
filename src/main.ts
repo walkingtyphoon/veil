@@ -148,7 +148,11 @@ async function run() {
     });
     renderLedger();
   } catch (err) {
-    $('answer').textContent = `Error: ${(err as Error).message}`;
+    const msg = (err as Error).message || String(err);
+    const hint = /App Check/i.test(msg)
+      ? ' Register this browser\'s App Check debug token in the Firebase console (App Check > Apps > Manage debug tokens), then reload. See README.'
+      : '';
+    $('answer').textContent = `Error: ${msg}${hint}`;
   } finally {
     renderRoute();
   }

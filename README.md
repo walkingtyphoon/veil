@@ -56,12 +56,29 @@ Firebase setup:
 
 1. Create a Firebase project, open **AI Services > AI Logic > Get started**, choose **Gemini Developer API**.
 2. Register a Web app and copy its config into `.env.local`.
-3. App Check is enforced by the AI Logic setup. For local runs, copy the debug token printed in the
-   browser console into **App Check > Apps > Manage debug tokens**. For hosting, add a reCAPTCHA
-   Enterprise key as `VITE_RECAPTCHA_ENTERPRISE_KEY`.
+3. App Check is enforced by Firebase AI Logic. Until a debug token is registered, cloud calls fail
+   with `401 Firebase App Check token is invalid` (the token exchange itself returns
+   `403 App attestation failed`).
+   Steps for local development:
+   1. Leave `VITE_APPCHECK_DEBUG=true` in `.env.local`. A reCAPTCHA Enterprise site key is not
+      required for debug runs.
+   2. Run `npm run dev` and open the app in Chrome. Open **DevTools > Console**.
+   3. Copy the value after `Firebase App Check debug token:`. This value is a secret. Do not commit
+      it or paste it into a public issue, README, or chat.
+   4. In the [Firebase console](https://console.firebase.google.com/), open the project >
+      **Build > App Check > Apps**. Open the overflow menu on the Web app > **Manage debug tokens**
+      > **Add debug token**, paste the token, and save.
+      You can also run this on a machine where the Firebase CLI is already logged in:
+      `firebase appcheck:debugtokens:create <TOKEN> --project <PROJECT_ID> --app <APP_ID>`
+   5. Reload the app (do a hard refresh). The same browser can then exchange the debug token.
+      Each browser and device gets its own token, so register both this development machine and
+      any other computer you use to test. Revoke tokens when you finish debugging.
+   For a public hosted build, add a reCAPTCHA Enterprise site key as `VITE_RECAPTCHA_ENTERPRISE_KEY`
+   and do not ship the debug provider.
 4. Optional: create Remote Config parameters `local_char_limit` (number), `heavy_tasks` (comma list),
-   `cloud_model` (string).
-5. Deploy: `npm run build && npx firebase-tools deploy --only hosting`.
+   `cloud_model` (string). If no template exists, the app uses the defaults in `src/router.ts`.
+5. Deploy from a machine where the Firebase CLI is logged into the project owner account:
+   `npm run build && npx firebase-tools deploy --only hosting`.
 
 Without a Firebase config the app still scans and masks with local rules, but the Run button stays
 disabled. It never fakes model output.
