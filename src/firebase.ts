@@ -21,9 +21,14 @@ export function getFirebaseApp(): FirebaseApp | null {
     messagingSenderId: env.VITE_FIREBASE_MESSAGING_SENDER_ID,
     appId: env.VITE_FIREBASE_APP_ID,
   });
-  // Local development: let the App Check debug provider print a token to the console.
+  // Local development: use a debug token already set on `self` (for automated tests
+  // that must reuse a registered token), otherwise ask the SDK to mint one and
+  // print it to the console. Never put the token in source or Vite env.
   if (env.DEV || env.VITE_APPCHECK_DEBUG === 'true') {
-    (self as unknown as { FIREBASE_APPCHECK_DEBUG_TOKEN: boolean }).FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+    const w = self as unknown as { FIREBASE_APPCHECK_DEBUG_TOKEN?: boolean | string };
+    if (typeof w.FIREBASE_APPCHECK_DEBUG_TOKEN !== 'string' || !w.FIREBASE_APPCHECK_DEBUG_TOKEN) {
+      w.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+    }
   }
   initializeAppCheck(app, {
     provider: new ReCaptchaEnterpriseProvider(env.VITE_RECAPTCHA_ENTERPRISE_KEY || 'debug'),
