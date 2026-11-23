@@ -23,8 +23,7 @@ cheaper fallback, it is the **privacy boundary**.
 
 ## Who it is for
 
-More than 3.5 million foreign residents live in Japan (Immigration Services Agency figures), and many of them receive important letters in a
-language they do not read well. Today the easy option is to photograph or paste the letter into a cloud
+As of 30 June 2026, 4,281,026 foreign residents lived in Japan, according to the Immigration Services Agency of Japan (https://www.moj.go.jp/isa/publications/press/13_00070.html) (mid-to-long-term residents plus special permanent residents). Today the easy option is to photograph or paste the letter into a cloud
 AI, together with their name, My Number, insurance number and bank details. Veil gives them the same
 help while keeping identifiers on their own machine. The same pattern applies to anyone handling
 patient, tenant or employee data.
