@@ -1,5 +1,7 @@
 # Veil: ask AI about private documents without giving them away
 
+Live demo: https://veil-walkingtyphoon.web.app
+
 Veil is a Chrome web app for people who need help understanding sensitive paperwork (clinic results,
 lease notices, HR and visa emails, bank letters) but should not paste that paperwork into a cloud chatbot.
 

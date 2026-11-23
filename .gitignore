@@ -4,3 +4,8 @@ dist
 .env.local
 .firebase
 .appcheck-debug-token
+video-raw/
+video-out/
+screenshots/
+*.mov
+*.mp4
