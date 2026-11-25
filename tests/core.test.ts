@@ -173,6 +173,70 @@ describe('model output parsing', () => {
   });
 });
 
+describe('shorter id that is also a prefix of a longer number', () => {
+  const pairs = [
+    ['4532-1188-0042', '4532-1188-0042-9917'],
+    ['4532 1188 0042', '4532 1188 0042 9917'],
+    ['453211880042', '4532118800429917'],
+  ] as const;
+
+  it('masks a separate 12-digit My Number and the longer account', () => {
+    for (const [mine, account] of pairs) {
+      const text = [
+        'Riverside Clinic',
+        'Patient ID: RC-448213',
+        'MRN: 00482137',
+        `My Number: ${mine}.`,
+        `Account ${account}.`,
+        'Seen on 3 Nov 2026. Due $120 in 2026. Room 12.',
+      ].join('\n');
+      const ents = detectByRules(text);
+      expect(ents.some((e) => e.text === mine), mine).toBe(true);
+      expect(ents.some((e) => e.text === account), account).toBe(true);
+      const { masked, vault } = mask(text, ents);
+      expect(masked, mine).not.toContain(mine);
+      expect(masked, account).not.toContain('9917');
+      expect(masked, mine).not.toContain('RC-448213');
+      expect(masked, mine).not.toContain('00482137');
+      expect(masked, mine).toContain('3 Nov 2026');
+      expect(masked, mine).toContain('$120');
+      expect(masked, mine).toContain('in 2026');
+      expect(masked, mine).toContain('Room 12');
+      expect(leaks(masked, vault), mine).toEqual([]);
+      expect(rehydrate(masked, vault), mine).toBe(text);
+    }
+  });
+
+  it('keeps a manual mark of that shorter number and masks it', () => {
+    const mine = '4532-1188-0042';
+    const account = '4532-1188-0042-9917';
+    const text = `My Number: ${mine}. Account ${account}. Due $120 on 3 Nov 2026.`;
+    const withoutMine = detectByRules(text).filter((e) => e.text !== mine);
+    expect(withoutMine.some((e) => e.text === account)).toBe(true);
+    // Same merge the "add exact words" button uses.
+    const marked = mergeEntities(withoutMine, [{ type: 'OTHER', text: mine, source: 'rule' }]);
+    expect(marked.some((e) => e.text === mine)).toBe(true);
+    const { masked, vault } = mask(text, marked);
+    expect(masked).not.toContain(mine);
+    expect(masked).not.toContain('9917');
+    expect(masked).toContain('$120');
+    expect(masked).toContain('3 Nov 2026');
+    expect(leaks(masked, vault)).toEqual([]);
+    expect(rehydrate(masked, vault)).toBe(text);
+  });
+
+  it('does not clip a card when the shorter value only occurs inside it', () => {
+    const text = 'Account 4532-1188-0042-9917 only. Due $120.';
+    const ents = [
+      { type: 'ID_NUMBER' as const, text: '4532-1188-0042-9917', source: 'rule' as const },
+      { type: 'ID_NUMBER' as const, text: '4532-1188-0042', source: 'rule' as const },
+    ];
+    const { masked, vault } = mask(text, mergeEntities(ents));
+    expect(masked).toBe('Account [ID_NUMBER_1] only. Due $120.');
+    expect(rehydrate(masked, vault)).toBe(text);
+  });
+});
+
 describe('mask and rehydrate', () => {
   it('round-trips and leaks nothing', () => {
     const ents = mergeEntities(detectByRules(SAMPLE), [
