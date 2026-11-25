@@ -205,13 +205,19 @@ export function parseModelEntities(json: string, source: string): Entity[] {
   return out;
 }
 
-/** Merge entity lists, dropping duplicates and entities fully contained in a longer one. */
+/**
+ * Merge entity lists, collapsing exact duplicates (first one wins).
+ * A shorter value is kept when a longer value contains it: the shorter one may
+ * be a separate occurrence, such as a 12-digit My Number that is also the prefix
+ * of a card. mask() replaces longest-first, so a fragment that only occurs inside
+ * a longer value is not replaced again.
+ */
 export function mergeEntities(...lists: Entity[][]): Entity[] {
-  const all = lists.flat();
   const byText = new Map<string, Entity>();
-  for (const e of all) if (!byText.has(e.text)) byText.set(e.text, e);
-  const uniq = [...byText.values()].sort((a, b) => b.text.length - a.text.length);
-  return uniq.filter((e, i) => !uniq.slice(0, i).some((longer) => longer.text.includes(e.text)));
+  for (const e of lists.flat()) {
+    if (e.text && !byText.has(e.text)) byText.set(e.text, e);
+  }
+  return [...byText.values()].sort((a, b) => b.text.length - a.text.length);
 }
 
 function escapeRe(s: string): string {
